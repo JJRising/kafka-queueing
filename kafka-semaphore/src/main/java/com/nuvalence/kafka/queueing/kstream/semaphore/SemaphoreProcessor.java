@@ -63,9 +63,4 @@ public class SemaphoreProcessor implements Processor<UUID, Event, UUID, Event> {
     private void raiseSemaphoreReleaseFlag(UUID resourceId) {
         semaphore.releaseResource(resourceId);
     }
-
-    @Override
-    public void close() {
-        Processor.super.close();
-    }
 }

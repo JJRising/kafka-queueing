@@ -23,9 +23,4 @@ public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Com
         // TODO - implement queueing
         this.context.forward(record);
     }
-
-    @Override
-    public void close() {
-        Processor.super.close();
-    }
 }
