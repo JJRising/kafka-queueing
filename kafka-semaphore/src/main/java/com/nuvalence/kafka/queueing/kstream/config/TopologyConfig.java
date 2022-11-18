@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 public class TopologyConfig {
 
     private String inputTopicName;
+    private String eventTopicName;
     private String outputTopicName;
 
     private Map<String, String> properties = new HashMap<>();

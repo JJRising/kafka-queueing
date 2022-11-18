@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package queueing;
+
+option java_multiple_files = true;
+option java_package = "com.nuvalence.kafka.queueing.proto";
+option java_outer_classname = "EventProto";
+
+message Event {
+  enum TYPE{
+    INITIALIZING = 0;
+    CONTINUING = 1;
+    TERMINATING = 2;
+  }
+
+  bytes id = 1;
+  string message = 2;
+  TYPE type = 3;
+}
