@@ -35,6 +35,10 @@ public class SemaphoreProcessorSupplier implements ProcessorSupplier<UUID, Event
                 Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(SEMAPHORE_STORE),
                         Serdes.UUID(),
                         Serdes.ListSerde(ArrayList.class, Serdes.UUID()));
-        return Collections.singleton(keyValueStoreStoreBuilder);
+        StoreBuilder<KeyValueStore<UUID, Short>> semaphoreReleaseMapBuilder =
+                Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(SEMAPHORE_RELEASE_MAP),
+                        Serdes.UUID(),
+                        Serdes.Short());
+        return Set.of(keyValueStoreStoreBuilder, semaphoreReleaseMapBuilder);
     }
 }

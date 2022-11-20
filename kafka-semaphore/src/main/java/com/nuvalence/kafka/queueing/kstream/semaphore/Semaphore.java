@@ -11,14 +11,14 @@ public class Semaphore {
     private final Map<UUID, Integer> semaphoreLimits;
 
     private KeyValueStore<UUID, List<UUID>> semaphoreStore;
-    private KeyValueStore<UUID, Boolean> semaphoreReleaseMap;
+    private KeyValueStore<UUID, Short> semaphoreReleaseMap;
 
     public Semaphore(Map<UUID, Integer> semaphoreLimits) {
         this.semaphoreLimits = semaphoreLimits;
     }
 
     public void init(KeyValueStore<UUID, List<UUID>> semaphoreStore,
-                     KeyValueStore<UUID, Boolean> semaphoreReleaseMap) {
+                     KeyValueStore<UUID, Short> semaphoreReleaseMap) {
         this.semaphoreStore = semaphoreStore;
         this.semaphoreReleaseMap = semaphoreReleaseMap;
     }
@@ -39,7 +39,7 @@ public class Semaphore {
         if (activeSemaphores.remove(commandId)) {
             semaphoreStore.put(resourceId, activeSemaphores);
             if (semaphoreLimits.get(resourceId) - activeSemaphores.size() == 1) {
-                semaphoreReleaseMap.put(resourceId, true);
+                semaphoreReleaseMap.put(resourceId, (short) 1);
             }
         }
     }
@@ -47,9 +47,9 @@ public class Semaphore {
     public List<UUID> getReleasedResources() {
         List<UUID> ret = new ArrayList<>();
         semaphoreReleaseMap.all().forEachRemaining(kv -> {
-            if (kv.value) {
+            if (kv.value > 0) {
                 ret.add(kv.key);
-                semaphoreReleaseMap.put(kv.key, false);
+                semaphoreReleaseMap.put(kv.key, (short) 0);
             }
         });
         return ret;

@@ -1,4 +1,4 @@
-package com.nuvalence.kafka.queueing.kstream.config;
+package com.nuvalence.kafka.queueing.kstream.queue;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,5 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "kafka-queueing")
 public class QueueingConfig {
 
-    private int defaultMaxInflight;
+    private long semaphoreScanIntervalMillis = 100L;
 }
