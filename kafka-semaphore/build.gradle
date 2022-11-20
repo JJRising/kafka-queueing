@@ -64,7 +64,7 @@ docker {
 	dependsOn bootJar
 	name "${rootProject.name}/${project.name}"
 	dockerfile file("${project.projectDir}/src/main/docker/Dockerfile")
-	files tasks.bootJar.outputs, 'kafka-queueing.jar'
+	files tasks.bootJar.outputs, 'kafka-semaphore.jar'
 }
 
 protobuf {
