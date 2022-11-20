@@ -1,26 +1,57 @@
 package com.nuvalence.kafka.queueing.kstream.semaphore;
 
-import org.springframework.stereotype.Component;
+import org.apache.kafka.streams.state.KeyValueStore;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-@Component
 public class Semaphore {
-    private final Map<UUID, Boolean> semaphoreReleaseFlag = new HashMap<>();
+    private final Map<UUID, Integer> semaphoreLimits;
 
-    public List<UUID> getReleasedResources() {
-        return semaphoreReleaseFlag.entrySet().stream()
-                .filter(Map.Entry::getValue)
-                .peek(e -> e.setValue(false))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+    private KeyValueStore<UUID, List<UUID>> semaphoreStore;
+    private KeyValueStore<UUID, Boolean> semaphoreReleaseMap;
+
+    public Semaphore(Map<UUID, Integer> semaphoreLimits) {
+        this.semaphoreLimits = semaphoreLimits;
     }
 
-    public void releaseResource(UUID resourceId) {
-        semaphoreReleaseFlag.put(resourceId, true);
+    public void init(KeyValueStore<UUID, List<UUID>> semaphoreStore,
+                     KeyValueStore<UUID, Boolean> semaphoreReleaseMap) {
+        this.semaphoreStore = semaphoreStore;
+        this.semaphoreReleaseMap = semaphoreReleaseMap;
+    }
+
+    public boolean acquireSemaphore(UUID resourceId, UUID commandId) {
+        List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
+        if (activeSemaphores.size() < semaphoreLimits.get(resourceId)) {
+            activeSemaphores.add(commandId);
+            semaphoreStore.put(resourceId, activeSemaphores);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void releaseSemaphore(UUID resourceId, UUID commandId) {
+        List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
+        if (activeSemaphores.remove(commandId)) {
+            semaphoreStore.put(resourceId, activeSemaphores);
+            if (semaphoreLimits.get(resourceId) - activeSemaphores.size() == 1) {
+                semaphoreReleaseMap.put(resourceId, true);
+            }
+        }
+    }
+
+    public List<UUID> getReleasedResources() {
+        List<UUID> ret = new ArrayList<>();
+        semaphoreReleaseMap.all().forEachRemaining(kv -> {
+            if (kv.value) {
+                ret.add(kv.key);
+                semaphoreReleaseMap.put(kv.key, false);
+            }
+        });
+        return ret;
     }
 }

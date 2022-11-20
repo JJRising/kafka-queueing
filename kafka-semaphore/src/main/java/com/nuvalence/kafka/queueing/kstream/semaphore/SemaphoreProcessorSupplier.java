@@ -1,6 +1,5 @@
 package com.nuvalence.kafka.queueing.kstream.semaphore;
 
-import com.nuvalence.kafka.queueing.kstream.config.QueueingConfig;
 import com.nuvalence.kafka.queueing.proto.Event;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.processor.api.Processor;
@@ -16,18 +15,17 @@ import java.util.*;
 public class SemaphoreProcessorSupplier implements ProcessorSupplier<UUID, Event, UUID, Event> {
 
     public static final String SEMAPHORE_STORE = "semaphore-store";
+    public static final String SEMAPHORE_RELEASE_MAP = "semaphore-release-map";
 
-    private final QueueingConfig queueingConfig;
-    private final Semaphore semaphore;
+    private final SemaphoreConfig semaphoreConfig;
 
-    public SemaphoreProcessorSupplier(QueueingConfig queueingConfig, Semaphore semaphore) {
-        this.queueingConfig = queueingConfig;
-        this.semaphore = semaphore;
+    public SemaphoreProcessorSupplier(SemaphoreConfig semaphoreConfig) {
+        this.semaphoreConfig = semaphoreConfig;
     }
 
     @Override
     public Processor<UUID, Event, UUID, Event> get() {
-        return new SemaphoreProcessor(queueingConfig, semaphore);
+        return new SemaphoreProcessor(new Semaphore(semaphoreConfig.getSemaphoreLimits()));
     }
 
     @Override
