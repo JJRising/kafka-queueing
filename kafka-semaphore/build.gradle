@@ -41,7 +41,7 @@ dependencies {
 	implementation 'org.apache.kafka:kafka-streams'
 	implementation 'io.confluent:kafka-streams-protobuf-serde:7.2.1'
 
-	implementation 'com.google.protobuf:protobuf-java:3.21.6'
+	implementation 'com.google.protobuf:protobuf-java:3.21.7'
 	implementation 'io.grpc:grpc-stub:1.15.1'
 	implementation 'io.grpc:grpc-protobuf:1.15.1'
 

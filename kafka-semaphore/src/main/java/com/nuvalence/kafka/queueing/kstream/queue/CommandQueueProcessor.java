@@ -1,7 +1,7 @@
 package com.nuvalence.kafka.queueing.kstream.queue;
 
-import com.nuvalence.kafka.queueing.Command;
 import com.nuvalence.kafka.queueing.kstream.semaphore.Semaphore;
+import com.nuvalence.kafka.queueing.proto.Command;
 import org.apache.kafka.streams.processor.PunctuationType;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorContext;

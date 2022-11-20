@@ -1,8 +1,8 @@
 package com.nuvalence.kafka.queueing.kstream.queue;
 
-import com.nuvalence.kafka.queueing.Command;
 import com.nuvalence.kafka.queueing.kstream.semaphore.Semaphore;
 import com.nuvalence.kafka.queueing.kstream.semaphore.SemaphoreConfig;
+import com.nuvalence.kafka.queueing.proto.Command;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.processor.api.Processor;

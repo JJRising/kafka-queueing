@@ -1,11 +1,11 @@
 package com.nuvalence.kafka.queueing.kstream.topology;
 
-import com.nuvalence.kafka.queueing.Command;
 import com.nuvalence.kafka.queueing.kstream.config.TopologyConfig;
 import com.nuvalence.kafka.queueing.kstream.delivery.DeliveryProcessorSupplier;
 import com.nuvalence.kafka.queueing.kstream.queue.CommandQueueProcessorSupplier;
 import com.nuvalence.kafka.queueing.kstream.semaphore.SemaphoreProcessorSupplier;
 import com.nuvalence.kafka.queueing.kstream.validation.ValidationProcessorSupplier;
+import com.nuvalence.kafka.queueing.proto.Command;
 import com.nuvalence.kafka.queueing.proto.Event;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
