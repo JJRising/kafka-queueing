@@ -77,8 +77,8 @@ public class QueueStreamTopologyBuilder {
                 .addProcessor(COMMAND_VALIDATION, commandValidationProcessorSupplier, COMMAND_SOURCE)
                 .addProcessor(SEMAPHORE_ACQUIRE_PROCESSOR, commandQueueProcessorSupplier, COMMAND_VALIDATION)
                 .addProcessor(SEMAPHORE_RELEASE_PROCESSOR, semaphoreProcessorSupplier, SEMAPHORE_RELEASE_SOURCE)
-                .addStateStore(commandQueue(), COMMAND_QUEUE)
-                .addStateStore(semaphoreStore(), SEMAPHORE_STORE)
+                .addStateStore(commandQueue())
+                .addStateStore(semaphoreStore())
                 .connectProcessorAndStateStores(SEMAPHORE_ACQUIRE_PROCESSOR, COMMAND_QUEUE, SEMAPHORE_STORE)
                 .connectProcessorAndStateStores(SEMAPHORE_RELEASE_PROCESSOR, COMMAND_QUEUE, SEMAPHORE_STORE)
                 .addProcessor(COMMAND_DELIVERY, commandDeliveryProcessorSupplier,

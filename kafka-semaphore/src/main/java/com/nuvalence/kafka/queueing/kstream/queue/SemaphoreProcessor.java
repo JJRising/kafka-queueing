@@ -51,7 +51,7 @@ public class SemaphoreProcessor implements Processor<UUID, Event, UUID, Command>
         if (activeSemaphores.remove(terminatingCommandId)) {
             semaphoreStore.put(resourceId, activeSemaphores);
             int semaphoreLimit = config.getSemaphoreLimits().getOrDefault(resourceId, config.getDefaultSemaphoreLimit());
-            return semaphoreLimit - activeSemaphores.size() == 1;
+            return semaphoreLimit - activeSemaphores.size() > 0;
         } else {
             return false;
         }
@@ -60,8 +60,15 @@ public class SemaphoreProcessor implements Processor<UUID, Event, UUID, Command>
     private void forwardNextCommand(UUID resourceId) {
         List<Command> queue = commandQueue.get(resourceId);
         if (queue != null && queue.size() > 0) {
+            // pop the next command from the state store
             Command next = queue.remove(0);
             commandQueue.put(resourceId, queue);
+
+            // put it in the semaphore list
+            List<UUID> activeSemaphores = Optional.ofNullable(semaphoreStore.get(resourceId)).orElse(new ArrayList<>());
+            activeSemaphores.add(uuidFromBytes(next.getId()));
+            semaphoreStore.put(resourceId, activeSemaphores);
+
             context.forward(new Record<>(resourceId, next, Instant.now().toEpochMilli()));
         }
     }
