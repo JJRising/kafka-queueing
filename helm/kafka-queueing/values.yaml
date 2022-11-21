@@ -1,0 +1,56 @@
+
+semaphore:
+  enabled: true
+  application:
+    config:
+      kafka-topology:
+        inputTopicName: command-requests
+        eventTopicName: command-events
+        outputTopicName: actionable-commands
+        properties:
+          "[application.id]": "command-queue"
+          "[num.stream.threads]": 1
+          "[bootstrap.servers]": "kafka.default.svc.cluster.local:9092"
+          "[schema.registry.url]": "http://schema-registry.default.svc.cluster.local:8081"
+          "[auto.register.schemas]": true
+      schema-registry:
+        schemaRegistryBaseUrl: "http://schema-registry.default.svc.cluster.local:8081"
+
+  image:
+    repository: ghcr.io/jjrising/kafka-queueing/kafka-semaphore
+    tag: latest
+  port: 8080
+  replicaCount: 0
+  resources:
+    limits:
+      cpu: 1
+      memory: 400M
+    requests:
+      cpu: 1
+      memory: 400M
+  serviceAccount:
+    annotations: {}
+
+kafka:
+  fullnameOverride: "kafka"
+  provisioning:
+    enabled: true
+    numPartitions: 12
+    topics:
+      - name: command-requests
+        partitions: 12
+        replicationFactor: 1
+      - name: command-events
+        partitions: 12
+        replicationFactor: 1
+      - name: actionable-commands
+        partitions: 12
+        replicationFactor: 1
+
+schema-registry:
+  kafka:
+    enabled: false
+  fullnameOverride: "schema-registry"
+  externalKafka:
+    brokers:
+      - PLAINTEXT://kafka-headless.default.svc.cluster.local:9092

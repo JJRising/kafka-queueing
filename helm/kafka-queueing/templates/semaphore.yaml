@@ -1,0 +1,96 @@
+{{if .Values.semaphore.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+    {{- include "kafka-queueing.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.semaphore.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kafka-queueing.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "kafka-queueing.fullname" . }}-semaphore
+  template:
+    metadata:
+      labels:
+        {{- include "kafka-queueing.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "kafka-queueing.fullname" . }}-semaphore
+      imagePullSecrets:
+        - name: dockerconfigjson-github-com
+      containers:
+        - name: semaphore
+          image: "{{ .Values.semaphore.image.repository }}:{{ .Values.semaphore.image.tag }}"
+          imagePullPolicy: Never
+          resources:
+            {{- toYaml .Values.semaphore.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+    {{- include "kafka-queueing.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.semaphore.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "kafka-queueing.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+    {{- include "kafka-queueing.labels" . | nindent 4 }}
+  {{- with .Values.semaphore.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+    {{- include "kafka-queueing.labels" . | nindent 4 }}
+data:
+  {{- with .Values.semaphore.application.config }}
+  application.yaml: |
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+    {{- include "kafka-queueing.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - watch
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  labels:
+  {{- include "kafka-queueing.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kafka-queueing.fullname" . }}-semaphore
+roleRef:
+  kind: Role
+  name: {{ include "kafka-queueing.fullname" . }}-semaphore
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

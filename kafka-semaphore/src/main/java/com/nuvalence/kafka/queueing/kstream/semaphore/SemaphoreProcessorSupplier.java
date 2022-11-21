@@ -31,7 +31,7 @@ public class SemaphoreProcessorSupplier implements ProcessorSupplier<UUID, Event
     @Override
     public Set<StoreBuilder<?>> stores() {
         @SuppressWarnings("unchecked") // ArrayList has no inner type that can be anticipated
-        StoreBuilder<KeyValueStore<UUID, List<UUID>>> keyValueStoreStoreBuilder =
+        StoreBuilder<KeyValueStore<UUID, List<UUID>>> semaphoreStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(SEMAPHORE_STORE),
                         Serdes.UUID(),
                         Serdes.ListSerde(ArrayList.class, Serdes.UUID()));
@@ -39,6 +39,6 @@ public class SemaphoreProcessorSupplier implements ProcessorSupplier<UUID, Event
                 Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(SEMAPHORE_RELEASE_MAP),
                         Serdes.UUID(),
                         Serdes.Short());
-        return Set.of(keyValueStoreStoreBuilder, semaphoreReleaseMapBuilder);
+        return Set.of(semaphoreStoreBuilder, semaphoreReleaseMapBuilder);
     }
 }

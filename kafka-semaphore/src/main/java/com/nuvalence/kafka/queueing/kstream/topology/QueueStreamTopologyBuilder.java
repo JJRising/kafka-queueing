@@ -16,6 +16,9 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.springframework.stereotype.Component;
 
+import static com.nuvalence.kafka.queueing.kstream.semaphore.SemaphoreProcessorSupplier.SEMAPHORE_RELEASE_MAP;
+import static com.nuvalence.kafka.queueing.kstream.semaphore.SemaphoreProcessorSupplier.SEMAPHORE_STORE;
+
 @Component
 public class QueueStreamTopologyBuilder {
 
@@ -68,7 +71,9 @@ public class QueueStreamTopologyBuilder {
                         COMMAND_DELIVERY)
                 .addSource(SEMAPHORE_RELEASE_SOURCE,
                         new UUIDDeserializer(),
-                        new KafkaProtobufDeserializer<>(schemaRegistryClient, streamsConfig.originals(), Event.class))
-                .addProcessor(SEMAPHORE_RELEASE_PROCESSOR, semaphoreProcessorSupplier, SEMAPHORE_RELEASE_SOURCE);
+                        new KafkaProtobufDeserializer<>(schemaRegistryClient, streamsConfig.originals(), Event.class),
+                        topologyConfig.getEventTopicName())
+                .addProcessor(SEMAPHORE_RELEASE_PROCESSOR, semaphoreProcessorSupplier, SEMAPHORE_RELEASE_SOURCE)
+                .connectProcessorAndStateStores(COMMAND_QUEUE, SEMAPHORE_STORE, SEMAPHORE_RELEASE_MAP);
     }
 }

@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Semaphore {
+
+    private final int DEFAULT_SEMAPHORE_LIMIT = 1;
+
     private final Map<UUID, Integer> semaphoreLimits;
 
     private KeyValueStore<UUID, List<UUID>> semaphoreStore;
@@ -25,7 +28,7 @@ public class Semaphore {
 
     public boolean acquireSemaphore(UUID resourceId, UUID commandId) {
         List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
-        if (activeSemaphores.size() < semaphoreLimits.get(resourceId)) {
+        if (activeSemaphores.size() < semaphoreLimits.getOrDefault(resourceId, DEFAULT_SEMAPHORE_LIMIT)) {
             activeSemaphores.add(commandId);
             semaphoreStore.put(resourceId, activeSemaphores);
             return true;
@@ -38,7 +41,7 @@ public class Semaphore {
         List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
         if (activeSemaphores.remove(commandId)) {
             semaphoreStore.put(resourceId, activeSemaphores);
-            if (semaphoreLimits.get(resourceId) - activeSemaphores.size() == 1) {
+            if (semaphoreLimits.getOrDefault(resourceId, DEFAULT_SEMAPHORE_LIMIT) - activeSemaphores.size() == 1) {
                 semaphoreReleaseMap.put(resourceId, (short) 1);
             }
         }

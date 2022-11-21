@@ -16,7 +16,7 @@ import java.util.UUID;
 @ConfigurationProperties(prefix = "semaphore")
 public class SemaphoreConfig {
 
-    private Map<UUID, Integer> semaphoreLimits;
+    private Map<UUID, Integer> semaphoreLimits = new HashMap<>();
 
     @Bean
     public Map<UUID, Boolean> semaphoreReleaseMap() {
