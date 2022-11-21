@@ -15,12 +15,41 @@ semaphore:
           "[auto.register.schemas]": true
       schema-registry:
         schemaRegistryBaseUrl: "http://schema-registry.default.svc.cluster.local:8081"
-
   image:
-    repository: ghcr.io/jjrising/kafka-queueing/kafka-semaphore
+    repository: kafka-queueing/kafka-semaphore
     tag: latest
   port: 8080
-  replicaCount: 0
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 400M
+    requests:
+      cpu: 1
+      memory: 400M
+  serviceAccount:
+    annotations: {}
+
+testingInterface:
+  enabled: true
+  application:
+    config:
+      server:
+        port: 8080
+      kafka:
+        commandRequestTopic: command-requests
+        eventTopic: command-events
+        kafkaConfigProps:
+          "[bootstrap.servers]": "kafka.default.svc.cluster.local:9092"
+          "[schema.registry.url]": "http://schema-registry.default.svc.cluster.local:8081"
+          "[auto.register.schemas]": true
+          "[key.serializer]": "org.apache.kafka.common.serialization.UUIDSerializer"
+          "[value.serializer]": "org.apache.kafka.common.serialization.UUIDSerializer"
+  image:
+    repository: kafka-queueing/testing-interface
+    tag: latest
+  port: 8080
+  replicaCount: 1
   resources:
     limits:
       cpu: 1

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package queueing;
+
+option java_multiple_files = true;
+option java_package = "com.nuvalence.kafka.queueing.proto";
+option java_outer_classname = "CommandProto";
+
+message Command {
+  bytes id = 1;
+  string message = 2;
+}

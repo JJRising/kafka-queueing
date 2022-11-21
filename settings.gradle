@@ -1,2 +1,3 @@
 rootProject.name = 'kafka-queueing'
 include 'kafka-semaphore'
+include 'testing-interface'

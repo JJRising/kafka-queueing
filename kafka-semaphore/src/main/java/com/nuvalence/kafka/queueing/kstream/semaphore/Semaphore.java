@@ -2,10 +2,7 @@ package com.nuvalence.kafka.queueing.kstream.semaphore;
 
 import org.apache.kafka.streams.state.KeyValueStore;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Semaphore {
 
@@ -27,7 +24,7 @@ public class Semaphore {
     }
 
     public boolean acquireSemaphore(UUID resourceId, UUID commandId) {
-        List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
+        List<UUID> activeSemaphores = Optional.ofNullable(semaphoreStore.get(resourceId)).orElse(new ArrayList<>());
         if (activeSemaphores.size() < semaphoreLimits.getOrDefault(resourceId, DEFAULT_SEMAPHORE_LIMIT)) {
             activeSemaphores.add(commandId);
             semaphoreStore.put(resourceId, activeSemaphores);
@@ -38,7 +35,7 @@ public class Semaphore {
     }
 
     public void releaseSemaphore(UUID resourceId, UUID commandId) {
-        List<UUID> activeSemaphores = semaphoreStore.get(resourceId);
+        List<UUID> activeSemaphores = Optional.ofNullable(semaphoreStore.get(resourceId)).orElse(new ArrayList<>());
         if (activeSemaphores.remove(commandId)) {
             semaphoreStore.put(resourceId, activeSemaphores);
             if (semaphoreLimits.getOrDefault(resourceId, DEFAULT_SEMAPHORE_LIMIT) - activeSemaphores.size() == 1) {

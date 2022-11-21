@@ -4,7 +4,10 @@ import com.nuvalence.kafka.queueing.kstream.semaphore.Semaphore;
 import com.nuvalence.kafka.queueing.kstream.semaphore.SemaphoreConfig;
 import com.nuvalence.kafka.queueing.proto.Command;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.streams.serdes.protobuf.KafkaProtobufSerde;
+import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
@@ -22,13 +25,16 @@ public class CommandQueueProcessorSupplier implements ProcessorSupplier<UUID, Co
     private final QueueingConfig queueingConfig;
     private final SemaphoreConfig semaphoreConfig;
     private final SchemaRegistryClient schemaRegistryClient;
+    private final StreamsConfig streamsConfig;
 
     public CommandQueueProcessorSupplier(QueueingConfig queueingConfig,
                                          SemaphoreConfig semaphoreConfig,
-                                         SchemaRegistryClient schemaRegistryClient) {
+                                         SchemaRegistryClient schemaRegistryClient,
+                                         StreamsConfig streamsConfig) {
         this.queueingConfig = queueingConfig;
         this.semaphoreConfig = semaphoreConfig;
         this.schemaRegistryClient = schemaRegistryClient;
+        this.streamsConfig = streamsConfig;
     }
 
     @Override
@@ -38,10 +44,13 @@ public class CommandQueueProcessorSupplier implements ProcessorSupplier<UUID, Co
 
     @Override
     public Set<StoreBuilder<?>> stores() {
+        Serde<Command> innerSerde = new KafkaProtobufSerde<>(schemaRegistryClient, Command.class);
+        innerSerde.configure(streamsConfig.originals(), false);
+        @SuppressWarnings("unchecked")
         StoreBuilder<KeyValueStore<UUID, List<Command>>> keyValueStoreStoreBuilder =
                 Stores.keyValueStoreBuilder(Stores.inMemoryKeyValueStore(COMMAND_QUEUE),
                         Serdes.UUID(),
-                        new CommandQueueSerde(schemaRegistryClient));
+                        Serdes.ListSerde(ArrayList.class, innerSerde));
         return Collections.singleton(keyValueStoreStoreBuilder);
     }
 }

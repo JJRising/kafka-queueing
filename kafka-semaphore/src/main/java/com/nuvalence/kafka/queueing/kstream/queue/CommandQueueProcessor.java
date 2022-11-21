@@ -9,7 +9,9 @@ import org.apache.kafka.streams.processor.api.Record;
 import org.apache.kafka.streams.state.KeyValueStore;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.nuvalence.kafka.queueing.kstream.queue.CommandQueueProcessorSupplier.COMMAND_QUEUE;
@@ -60,7 +62,7 @@ public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Com
         if (semaphore.acquireSemaphore(resourceId, commandId)) {
             context.forward(record);
         } else {
-            List<Command> queue = commandQueue.get(resourceId);
+            List<Command> queue = Optional.ofNullable(commandQueue.get(resourceId)).orElse(new ArrayList<>());
             queue.add(record.value());
             commandQueue.put(resourceId, queue);
         }
