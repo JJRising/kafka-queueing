@@ -50,7 +50,9 @@ You can then use the following APIs to interact with the application:
 
 ```shell
 # Create a new command to a random resource
-curl --location --request POST 'localhost:8080/command'
+curl --location --request POST 'localhost:8080/command' \
+--header 'Content-Type: text/plain' \
+--data-raw 'This is a message.'
 ### Example response
 {
     "resourceId": "80169888-0e7e-4901-8099-a9fb80b7806d",
@@ -59,12 +61,15 @@ curl --location --request POST 'localhost:8080/command'
 
 
 # Create a new command to a specific resource:
-curl --location --request POST 'localhost:8080/command/{resourceId}'
+curl --location --request POST 'localhost:8080/command/{resourceId}' \
+--header 'Content-Type: text/plain' \
+--data-raw 'You can put anything you want here.'
 ### Example response
 {
     "resourceId": "80169888-0e7e-4901-8099-a9fb80b7806d",
     "commandId": "275b3448-8c51-45d2-839f-4314b9700259"
 }
+
 
 # Send a terminal event to allow the next command in the queue to access the resource
 curl --location --request POST 'localhost:8080/event/{resourceId}/{commandId}'

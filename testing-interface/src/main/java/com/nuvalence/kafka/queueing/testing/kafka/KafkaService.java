@@ -25,13 +25,13 @@ public class KafkaService {
         this.config = config;
     }
 
-    public void sendNewCommandRequest(UUID resourceId, UUID commandId) {
+    public void sendNewCommandRequest(UUID resourceId, UUID commandId, String message) {
         commandTemplate.send(
                 config.getCommandRequestTopic(),
                 resourceId,
                 Command.newBuilder()
                         .setId(bytesFromUUID(commandId))
-                        .setMessage("New command request for " + resourceId)
+                        .setMessage(message)
                         .build());
     }
 
