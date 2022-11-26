@@ -17,12 +17,10 @@ spec:
         {{- include "kafka-queueing.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "kafka-queueing.fullname" . }}-testing-interface
-      imagePullSecrets:
-        - name: dockerconfigjson-github-com
       containers:
         - name: testing-interface
           image: "{{ .Values.testingInterface.image.repository }}:{{ .Values.testingInterface.image.tag }}"
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml .Values.testingInterface.resources | nindent 12 }}
 ---

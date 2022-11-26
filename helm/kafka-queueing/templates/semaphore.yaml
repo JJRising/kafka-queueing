@@ -17,12 +17,10 @@ spec:
         {{- include "kafka-queueing.selectorLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "kafka-queueing.fullname" . }}-semaphore
-      imagePullSecrets:
-        - name: dockerconfigjson-github-com
       containers:
         - name: semaphore
           image: "{{ .Values.semaphore.image.repository }}:{{ .Values.semaphore.image.tag }}"
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           resources:
             {{- toYaml .Values.semaphore.resources | nindent 12 }}
 ---

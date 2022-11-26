@@ -89,3 +89,10 @@ kubectl exec --stdin --tty kafka-0 -- \
 You can change the limits of how many Command's can be queued, and how many semaphores each 
 resource has through the configurations in `/helm/kafka-queueing/values.yaml`. These values are 
 under `semaphore.application.config.kafka-queueing`.
+
+### Building locally
+
+If you want to build upon the project, you can create your own version of the docker images by 
+using the gradle task `./gradlew docker` to create the images `kafka-queueing/kafka-semaphore` 
+and `kafka-queueing/testing-interface`. You can then change the image repository values in the 
+`/helm/kafka-queueing/values.yaml` file to use these local images.
