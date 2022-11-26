@@ -30,13 +30,13 @@ import java.util.UUID;
 public class QueueStreamTopologyBuilder {
 
     public static final String COMMAND_SOURCE = "command-source";
-    public static final String COMMAND_VALIDATION = "command-validation";
-    public static final String SEMAPHORE_ACQUIRE_PROCESSOR = "command-queue";
-    public static final String COMMAND_DELIVERY = "command-delivery";
+    public static final String COMMAND_VALIDATION = "command-validation-processor";
+    public static final String SEMAPHORE_ACQUIRE_PROCESSOR = "command-queue-processor";
+    public static final String COMMAND_DELIVERY = "command-delivery-processor";
     public static final String COMMAND_SINK = "command-sink";
     public static final String SEMAPHORE_RELEASE_SOURCE = "semaphore-release-source";
     public static final String SEMAPHORE_RELEASE_PROCESSOR = "semaphore-release-processor";
-    public static final String COMMAND_QUEUE = "command-queue";
+    public static final String COMMAND_QUEUE = "command-queue-store";
     public static final String SEMAPHORE_STORE = "semaphore-store";
 
     private final TopologyConfig topologyConfig;
