@@ -1,6 +1,7 @@
 package com.nuvalence.kafka.queueing.kstream.queue;
 
 import com.nuvalence.kafka.queueing.proto.Command;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Record;
@@ -12,17 +13,22 @@ import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyB
 import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyBuilder.SEMAPHORE_STORE;
 import static com.nuvalence.kafka.queueing.kstream.utils.UUIDUtils.uuidFromBytes;
 
+@Slf4j
 public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Command> {
 
     private ProcessorContext<UUID, Command> context;
     private KeyValueStore<UUID, List<Command>> commandQueue;
     private KeyValueStore<UUID, List<UUID>> semaphoreStore;
 
-    private final int defaultLimit;
+    private final int defaultQueueLimit;
+    private final Map<UUID, Integer> queueLimits;
+    private final int defaultSemaphoreLimit;
     private final Map<UUID, Integer> semaphoreLimits;
 
     public CommandQueueProcessor(QueueingConfig queueingConfig) {
-        this.defaultLimit = queueingConfig.getDefaultSemaphoreLimit();
+        this.defaultQueueLimit = queueingConfig.getDefaultQueueLimit();
+        this.queueLimits = queueingConfig.getQueueLimits();
+        this.defaultSemaphoreLimit = queueingConfig.getDefaultSemaphoreLimit();
         this.semaphoreLimits = queueingConfig.getSemaphoreLimits();
     }
 
@@ -41,13 +47,13 @@ public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Com
         if (acquireSemaphore(resourceId, commandId)) {
             context.forward(record);
         } else {
-            enqueueCommand(resourceId, record.value());
+            maybeEnqueueCommand(resourceId, record.value());
         }
     }
 
     private boolean acquireSemaphore(UUID resourceId, UUID commandId) {
         List<UUID> activeSemaphores = Optional.ofNullable(semaphoreStore.get(resourceId)).orElse(new ArrayList<>());
-        if (activeSemaphores.size() < semaphoreLimits.getOrDefault(resourceId, defaultLimit)) {
+        if (activeSemaphores.size() < semaphoreLimits.getOrDefault(resourceId, defaultSemaphoreLimit)) {
             activeSemaphores.add(commandId);
             semaphoreStore.put(resourceId, activeSemaphores);
             return true;
@@ -56,9 +62,13 @@ public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Com
         }
     }
 
-    private void enqueueCommand(UUID resourceId, Command command) {
+    private void maybeEnqueueCommand(UUID resourceId, Command command) {
         List<Command> queue = Optional.ofNullable(commandQueue.get(resourceId)).orElse(new ArrayList<>());
-        queue.add(command);
-        commandQueue.put(resourceId, queue);
+        if (queue.size() >= queueLimits.getOrDefault(resourceId, defaultQueueLimit)) {
+            queue.add(command);
+            commandQueue.put(resourceId, queue);
+        } else {
+            log.info("Dropping command {} due to queue being full.", uuidFromBytes(command.getId()));
+        }
     }
 }

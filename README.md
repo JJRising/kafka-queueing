@@ -83,3 +83,9 @@ kubectl exec --stdin --tty kafka-0 -- \
 /opt/bitnami/kafka/bin/kafka-console-consumer.sh \
 --bootstrap-server localhost:9092 --topic actionable-commands
 ```
+
+### Configurations
+
+You can change the limits of how many Command's can be queued, and how many semaphores each 
+resource has through the configurations in `/helm/kafka-queueing/values.yaml`. These values are 
+under `semaphore.application.config.kafka-queueing`.

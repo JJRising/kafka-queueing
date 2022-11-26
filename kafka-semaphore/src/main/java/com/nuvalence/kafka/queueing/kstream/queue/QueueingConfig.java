@@ -15,6 +15,10 @@ import java.util.UUID;
 @ConfigurationProperties(prefix = "kafka-queueing")
 public class QueueingConfig {
 
+    private int defaultQueueLimit = 5;
+
+    private Map<UUID, Integer> queueLimits = new HashMap<>();
+
     private int defaultSemaphoreLimit = 1;
 
     private Map<UUID, Integer> semaphoreLimits = new HashMap<>();

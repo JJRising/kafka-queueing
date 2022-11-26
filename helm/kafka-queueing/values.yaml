@@ -3,6 +3,13 @@ semaphore:
   enabled: true
   application:
     config:
+      kafka-queueing:
+        defaultQueueLimit: 1
+        queueLimits:
+          "[f0c291c3-5d28-4396-b8a8-859de530dd20]": 5
+        defaultSemaphoreLimit: 1
+        semaphoreLimits:
+          "[f0c291c3-5d28-4396-b8a8-859de530dd20]": 3
       kafka-topology:
         inputTopicName: command-requests
         eventTopicName: command-events
