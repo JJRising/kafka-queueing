@@ -7,6 +7,10 @@ import org.apache.kafka.streams.processor.api.Record;
 
 import java.util.UUID;
 
+/**
+ * This class would be where you would include any upstream processing and validation of commands
+ * before they attempt to obtain a semaphore or be queued.
+ */
 public class ValidationProcessor implements Processor<UUID, Command, UUID, Command> {
 
     private ProcessorContext<UUID, Command> context;

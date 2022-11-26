@@ -17,6 +17,10 @@ import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyB
 import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyBuilder.SEMAPHORE_STORE;
 import static com.nuvalence.kafka.queueing.kstream.utils.UUIDUtils.uuidFromBytes;
 
+/**
+ * This processor takes in events from the protected resource, and if they are a terminating events,
+ * it will release the semaphore, and forward the next command in the queue (if one exists).
+ */
 public class SemaphoreProcessor implements Processor<UUID, Event, UUID, Command> {
 
     private ProcessorContext<UUID, Command> context;

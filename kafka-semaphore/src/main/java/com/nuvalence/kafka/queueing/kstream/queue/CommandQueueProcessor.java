@@ -13,6 +13,12 @@ import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyB
 import static com.nuvalence.kafka.queueing.kstream.topology.QueueStreamTopologyBuilder.SEMAPHORE_STORE;
 import static com.nuvalence.kafka.queueing.kstream.utils.UUIDUtils.uuidFromBytes;
 
+/**
+ * In this processor, records are coming in just after being requested. If a semaphore can be taken
+ * for the command, it will be forwarded to the next Processor. If a semaphore is not available,
+ * the command will be queued for the {@link SemaphoreProcessor} to be forwarded when the semaphore
+ * is available.
+ */
 @Slf4j
 public class CommandQueueProcessor implements Processor<UUID, Command, UUID, Command> {
 

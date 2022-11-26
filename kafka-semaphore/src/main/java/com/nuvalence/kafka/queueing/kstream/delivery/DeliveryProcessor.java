@@ -7,6 +7,10 @@ import org.apache.kafka.streams.processor.api.Record;
 
 import java.util.UUID;
 
+/**
+ * This class is where you would do your pre-delivery processing for commands just before they are
+ * delivered, and after they have obtained a semaphore.
+ */
 public class DeliveryProcessor implements Processor<UUID, Command, UUID, Command> {
 
     private ProcessorContext<UUID, Command> context;
