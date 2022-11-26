@@ -51,6 +51,11 @@ jobs:
           docker push ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/kafka-semaphore:latest
           docker tag kafka-queueing/kafka-semaphore:latest ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/kafka-semaphore:${{ steps.semver.outputs.new_version }}
           docker push ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/kafka-semaphore:${{ steps.semver.outputs.new_version }}
+          
+          docker tag kafka-queueing/testing-interface:latest ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/testing-interface:latest
+          docker push ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/testing-interface:latest
+          docker tag kafka-queueing/testing-interface:latest ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/testing-interface:${{ steps.semver.outputs.new_version }}
+          docker push ghcr.io/${{ secrets.ACTIONS_GITHUB_USERNAME }}/kafka-queueing/testing-interface:${{ steps.semver.outputs.new_version }}
 
       # A hack workaround for https://github.com/rickstaa/action-create-tag/issues/10
       - name: "Change perms on GITHUB_WORKSPACE"

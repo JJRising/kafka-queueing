@@ -23,7 +23,8 @@ semaphore:
       schema-registry:
         schemaRegistryBaseUrl: "http://schema-registry.default.svc.cluster.local:8081"
   image:
-    repository: kafka-queueing/kafka-semaphore
+    # repository: kafka-queueing/kafka-semaphore
+    repository: ghcr.io/jjrising/kafka-queueing/kafka-semaphore
     tag: latest
   port: 8080
   replicaCount: 1
@@ -53,7 +54,8 @@ testingInterface:
           "[key.serializer]": "org.apache.kafka.common.serialization.UUIDSerializer"
           "[value.serializer]": "org.apache.kafka.common.serialization.UUIDSerializer"
   image:
-    repository: kafka-queueing/testing-interface
+    # repository: kafka-queueing/testing-interface
+    repository: ghcr.io/jjrising/kafka-queueing/testing-interface
     tag: latest
   port: 8080
   replicaCount: 1
