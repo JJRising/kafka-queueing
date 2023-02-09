@@ -27,7 +27,7 @@ C-->F(command-delivery-processor)
 E-->F
 F-->G((command-sink))
 H{command-queue-store}-.-C
-I{command-queue-store}-.-C
+I{semaphore-store}-.-C
 E-.-H
 E-.-I
 ```
